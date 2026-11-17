@@ -7,6 +7,8 @@ import { LINKS } from "../links";
 import { h } from "./dom";
 import { SIRADEL_LOGO } from "./siradel-logo";
 
+const licenceUrl = (file: string) => `${import.meta.env.BASE_URL}licenses/${file}`;
+
 const a = (href: string, text: string) => h("a", { href, target: "_blank", rel: "noopener" }, text);
 
 /** A paragraph mixing text and links: string parts are { en, fr } pairs. */
@@ -93,6 +95,14 @@ export function createAbout(): { open(section?: "sources"): void } {
             fr: "Ces informations ne sont ni publiées ni validées par les producteurs des données :",
         }),
         h("ul", {}, ...DERIVED.map((d) => h("li", {}, t(d)))),
+        // The licence files ship with the build (public/licenses), as the SIL OFL requires.
+        p(
+            { en: "Fonts: Bricolage Grotesque (", fr: "Polices : Bricolage Grotesque (" },
+            a(licenceUrl("BricolageGrotesque-OFL.txt"), "SIL OFL 1.1"),
+            { en: ") and Figtree (", fr: ") et Figtree (" },
+            a(licenceUrl("Figtree-OFL.txt"), "SIL OFL 1.1"),
+            { en: ").", fr: ")." },
+        ),
     );
 
     const dialog = h(

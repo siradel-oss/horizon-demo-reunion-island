@@ -115,8 +115,8 @@ The same information is available in the in-app **About** dialog.
 Code and tree models: [MIT](LICENSE). Data keeps the licence of its producer
 (see above). Reunion Island Explorer is not affiliated with the Région Réunion,
 Île de La Réunion Tourisme, the ONF, the Parc national de La Réunion or IGN.
-Bundled fonts (Bricolage Grotesque, Figtree) are under the SIL Open Font
-License, through Fontsource.
+Bundled fonts (Bricolage Grotesque, Figtree, through Fontsource) are under the
+SIL Open Font License 1.1; their licence files are in `public/licenses/`.
 
 ## Contact
 
