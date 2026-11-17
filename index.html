@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Reunion Island Explorer</title>
+        <meta name="description" content="3D digital twin of La Réunion and its hiking trails, a demonstrator of the Horizon 3D engine." />
+        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M2 26 L12 10 L16 16 L20 8 L30 26 Z' fill='%23d7263d'/%3E%3C/svg%3E" />
+        <!-- Static hosts without COOP/COEP headers (GitHub Pages): the service
+             worker adds them client-side, in `credentialless` mode so that IGN
+             tiles (no CORP header) still load. -->
+        <script>
+            window.coi = { coepCredentialless: () => true };
+        </script>
+        <script src="coi-serviceworker.min.js"></script>
+    </head>
+    <body>
+        <canvas id="viewer" tabindex="0"></canvas>
+
+        <!-- Opening: title over the dive from space. -->
+        <div id="intro" class="intro">
+            <div class="intro-title">
+                <h1>La Réunion</h1>
+                <p></p>
+            </div>
+            <div class="intro-status" role="status" aria-live="polite"></div>
+            <div class="intro-logo" role="img" aria-label="Siradel"></div>
+        </div>
+
+        <header class="topbar" hidden>
+            <div class="brand">Reunion Island <span>Explorer</span></div>
+            <nav class="tabs" role="tablist">
+                <button role="tab" class="tab" data-tab="explore" aria-selected="true"></button>
+                <button role="tab" class="tab" data-tab="poi" aria-selected="false"></button>
+                <button role="tab" class="tab" data-tab="hike" aria-selected="false"></button>
+            </nav>
+            <button class="ambiance-toggle" aria-expanded="false" aria-controls="ambiance"></button>
+            <button class="icon-toggle fullscreen-toggle">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" /></svg>
+            </button>
+            <button class="icon-toggle lang-toggle"></button>
+            <button class="icon-toggle about-toggle">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7.5v.01" /></svg>
+            </button>
+        </header>
+
+        <aside id="panel" class="panel" hidden>
+            <button class="sheet-handle"></button>
+            <div class="panel-body"></div>
+        </aside>
+        <div id="nav" hidden></div>
+        <section id="ambiance" class="ambiance" hidden></section>
+        <section id="dock" class="dock" hidden></section>
+
+        <div id="hover-tip" class="hover-tip" hidden></div>
+        <button class="leave-immersive"></button>
+        <footer class="credits" hidden>
+            <a class="credits-logo" target="_blank" rel="noopener" aria-label="Siradel"></a>
+            <button class="credits-sources"></button>
+        </footer>
+
+        <script type="module" src="/src/main.ts"></script>
+    </body>
+</html>
