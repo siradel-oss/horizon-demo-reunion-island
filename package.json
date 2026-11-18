@@ -1,13 +1,13 @@
 {
-    "name": "dih-reunion-explorer",
+    "name": "horizon-demo-reunion-island",
     "version": "0.1.0",
     "private": true,
     "description": "3D digital twin of La Réunion and its hiking trails, built as a demonstrator of the Horizon 3D engine.",
     "repository": {
         "type": "git",
-        "url": "https://github.com/siradel-oss/dih-reunion-explorer.git"
+        "url": "https://github.com/siradel-oss/horizon-demo-reunion-island.git"
     },
-    "homepage": "https://github.com/siradel-oss/dih-reunion-explorer",
+    "homepage": "https://github.com/siradel-oss/horizon-demo-reunion-island",
     "license": "MIT",
     "type": "module",
     "packageManager": "pnpm@10.33.0",

@@ -1,18 +1,58 @@
-# Reunion Island Explorer
+# Reunion Island Explorer — hiking trails of La Réunion in 3D
 
-An experimental **3D digital twin of La Réunion** and its hiking trails, in English
-and French. Fly over the island's relief, aerial imagery and buildings, browse
-places worth seeing, and follow 41 hiking routes with their elevation profile, a
-drone flyover, real trees from the IGN LiDAR survey and a sun / shade strip.
+An experimental **3D digital twin of Reunion Island** (La Réunion) and its hiking
+trails, in English and French. Fly over the volcanoes and cirques, then follow the
+trails in 3D, right in the browser.
 
-> **A demonstrator.** Reunion Island Explorer is a demo of
-> [Horizon](https://horizon.oss.siradel.com), Siradel's open source geospatial 3D
-> engine, which grew out of the [SCE](https://sce.oss.siradel.com) ecosystem.
-> It is still an experiment: the data processing may contain errors, and trail
+[![Reunion Island Explorer: a hiking trail in the Cirque de Mafate in 3D, with its elevation profile and sun / shade strip](.github/screenshot.webp)](https://siradel-oss.github.io/horizon-demo-reunion-island/)
+
+**[▶ Live demo](https://siradel-oss.github.io/horizon-demo-reunion-island/)**
+
+## Features
+
+- 3D relief, aerial imagery and buildings of the whole island, with an opening
+  dive from space
+- 41 hiking trails from OpenStreetMap with distance, ascent, walking time, level
+  and elevation profile
+- Drone flyover of every trail
+- Real trees along the trails, detected in the IGN LiDAR HD survey
+- Sun / shade strip: where the trail is in the sun at a given time of day
+- Places worth seeing with Wikipedia excerpts, place search, four light
+  ambiances
+
+## Built with Horizon
+
+Reunion Island Explorer is a demo of
+[Horizon](https://github.com/siradel-oss/horizon), Siradel's open source real-time
+3D engine for map data on a globe (WebAssembly, WebGL 2, TypeScript). It shows
+terrain and imagery streaming, PMTiles vector layers, instanced glTF models
+(trees), camera flights and dynamic sun lighting, without any UI framework.
+
+- Horizon: [website and documentation](https://horizon.oss.siradel.com) ·
+  [getting started](https://horizon.oss.siradel.com/doc/getting_started.html) ·
+  npm packages `@siradel-oss/horizon-{api,core,protocol}`
+- More Horizon demos:
+  [IGN Explorer](https://github.com/siradel-oss/horizon-demo-ign-geoplateforme)
+  (IGN Géoplateforme catalogue in 3D) ·
+  [Shoreline Explorer](https://github.com/siradel-oss/horizon-demo-coastline-erosion)
+  (coastal erosion in France)
+
+> **A demonstrator.** Horizon grew out of the [SCE](https://sce.oss.siradel.com)
+> ecosystem. Reunion Island Explorer is still an experiment: the data processing
+> may contain errors, and trail
 > times, levels and routes are indicative only. **Do not use it to plan or follow
 > a hike**; check trail closures with the
 > [ONF](https://www.onf.fr/vivre-la-foret/+/b90::randonnee-la-reunion-connaitre-les-sentiers-fermes.html)
 > and the weather before setting off.
+
+## En français
+
+Reunion Island Explorer est un jumeau numérique 3D expérimental de **l'île de La
+Réunion** et de ses **sentiers de randonnée** : relief, orthophotos et bâtiments,
+41 randonnées avec profil altimétrique, survol en drone, arbres issus du LiDAR HD
+de l'IGN et bande soleil / ombre. Démonstrateur du moteur 3D open source Horizon,
+interface en français et en anglais. À ne pas utiliser pour préparer une
+randonnée.
 
 ## Run it
 

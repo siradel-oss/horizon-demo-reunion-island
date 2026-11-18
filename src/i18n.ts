@@ -5,7 +5,7 @@
 export type Lang = "en" | "fr";
 export type Text = { en: string; fr: string };
 
-const STORAGE_KEY = "dih-reunion-explorer:lang";
+const STORAGE_KEY = "horizon-demo-reunion-island:lang";
 
 function initialLang(): Lang {
     const fromUrl = new URLSearchParams(location.search).get("lang");
