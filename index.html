@@ -19,11 +19,9 @@
         <meta name="twitter:card" content="summary_large_image" />
         <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M2 26 L12 10 L16 16 L20 8 L30 26 Z' fill='%23d7263d'/%3E%3C/svg%3E" />
         <!-- Static hosts without COOP/COEP headers (GitHub Pages): the service
-             worker adds them client-side, in `credentialless` mode so that IGN
-             tiles (no CORP header) still load. -->
-        <script>
-            window.coi = { coepCredentialless: () => true };
-        </script>
+             worker adds them client-side, with its default policy (as in the
+             other Horizon demos). Forcing `credentialless` left Firefox for
+             Android without cross-origin isolation: the engine never started. -->
         <script src="coi-serviceworker.min.js"></script>
     </head>
     <body>

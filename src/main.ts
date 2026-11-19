@@ -121,6 +121,14 @@ $(".lang-toggle").setAttribute("lang", t({ en: "fr", fr: "en" }));
 $(".lang-toggle").addEventListener("click", () => setLang(t({ en: "fr", fr: "en" }) as Lang));
 
 async function main() {
+    // A stuck start throws nothing: say so after a while, in plain words.
+    const stalled = setTimeout(() => {
+        introStatus.textContent = t({
+            en: "The 3D view cannot start on this device or browser. Please try again on another device or browser.",
+            fr: "La vue 3D ne peut pas démarrer sur cet appareil ou ce navigateur. Essayez sur un autre appareil ou un autre navigateur.",
+        });
+        introStatus.classList.add("error");
+    }, 30_000);
     const [api, trailsData, poisData, sunData] = await Promise.all([boot(canvas), loadTrails(), loadPois(), loadSun()]);
     onEngineMessage((m) => m.assetRequest && serveTerrainAsset(api, m.assetRequest));
     // Dev only: drive the engine from the browser console.
@@ -141,7 +149,9 @@ async function main() {
     await initCamera(api, START_FOCAL);
     initHover(api);
 
+    clearTimeout(stalled);
     introStatus.textContent = "";
+    introStatus.classList.remove("error");
     $("#intro").classList.add("flying");
     await introFlight(api, INTRO_SECONDS);
     setTimeout(() => $("#intro").classList.add("leaving"), Math.max(0, INTRO_SECONDS - 3.2) * 1000);
