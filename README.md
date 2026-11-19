@@ -4,7 +4,7 @@ An experimental **3D digital twin of Reunion Island** (La Réunion) and its hiki
 trails, in English and French. Fly over the volcanoes and cirques, then follow the
 trails in 3D, right in the browser.
 
-[![Reunion Island Explorer: a hiking trail in the Cirque de Mafate in 3D, with its elevation profile and sun / shade strip](.github/screenshot.webp)](https://siradel-oss.github.io/horizon-demo-reunion-island/)
+[![Reunion Island Explorer: the GR R1 loop in the Cirque de Cilaos in 3D, with its elevation profile and sun / shade strip](.github/screenshot.webp)](https://siradel-oss.github.io/horizon-demo-reunion-island/)
 
 **[▶ Live demo](https://siradel-oss.github.io/horizon-demo-reunion-island/)**
 
