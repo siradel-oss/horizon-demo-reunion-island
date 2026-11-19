@@ -7,7 +7,7 @@
 import { HrzProtocol } from "@siradel-oss/horizon-protocol";
 import { DIFFICULTIES, type Trail, type TrailPoint } from "../data/trails";
 import type { Api } from "./horizon";
-import { color, colorByKind, createOverlay, dot, feature, line, point, type Feature, type ObjectRef } from "./overlays";
+import { color, colorByKind, createOverlay, dot, feature, line, point, px, type Feature, type ObjectRef } from "./overlays";
 
 export interface TrailLayers {
     /** Highlight one trail (dataset index) and dim the others; -1 restores all. */
@@ -46,12 +46,12 @@ export async function addTrailLayers(api: Api, trails: Trail[], attribution: str
             line(4, 4.5, 7, { defaultValue: color("#ffd166") }, {
                 dashes: {
                     mode: HrzProtocol.DashMode.DASH_ENABLED_FILLED,
-                    period: { defaultValue: 28 },
+                    period: { defaultValue: px(28) },
                     periodUnit: HrzProtocol.DashSizeUnit.DASH_SIZE_IN_PIXELS,
-                    primarySegmentLength: { defaultValue: 18 },
+                    primarySegmentLength: { defaultValue: px(18) },
                     primarySegmentLengthUnit: HrzProtocol.DashSizeUnit.DASH_SIZE_IN_PIXELS,
                     secondaryColor: { defaultValue: color("#fff8e1") },
-                    animationSpeed: { defaultValue: 24 },
+                    animationSpeed: { defaultValue: px(24) },
                     animationSpeedUnit: HrzProtocol.DashSizeUnit.DASH_SIZE_IN_PIXELS,
                 },
             }),

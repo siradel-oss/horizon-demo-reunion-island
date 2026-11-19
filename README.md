@@ -15,7 +15,7 @@ trails in 3D, right in the browser.
 - 41 hiking trails from OpenStreetMap with distance, ascent, walking time, level
   and elevation profile
 - Drone flyover of every trail
-- Real trees along the trails, detected in the IGN LiDAR HD survey
+- Real trees along the trails, detected in the IGN LiDAR HD survey (desktop only: phones get a lighter profile without trees or shadows)
 - Sun / shade strip: where the trail is in the sun at a given time of day
 - Places worth seeing with Wikipedia excerpts, place search, four light
   ambiances

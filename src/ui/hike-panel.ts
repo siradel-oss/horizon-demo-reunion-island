@@ -14,6 +14,7 @@ import {
 import { categoryOf, poisAlong, type Poi } from "../data/pois";
 import { LOCALE, num, t } from "../i18n";
 import { h } from "./dom";
+import { PHONE } from "../engine/device";
 import { sparkline } from "./profile";
 import { sheetNav } from "./sheet-nav";
 
@@ -251,7 +252,7 @@ export function createHikePanel(data: TrailsDataset, pois: Poi[], ev: HikePanelE
             trail.description ? h("p", { class: "sheet-text" }, trail.description) : null,
             along(trail),
             h("div", { class: "actions" }, flyButton, h("button", { class: "btn", onclick: () => ev.onFrame(i) }, t({ en: "Recenter", fr: "Recentrer" }))),
-            h(
+            PHONE ? null : h(
                 "button",
                 {
                     class: "btn trees-toggle",

@@ -83,11 +83,16 @@ export function setSunHour(api: Api, hour: number): void {
 /** Full-frame equivalent focal length (mm) → vertical field of view (degrees). */
 export const focalToFovy = (mm: number): number => (2 * Math.atan(12 / mm) * 180) / Math.PI;
 
+/** Current vertical field of view (degrees), for framing. */
+let fovyDeg = focalToFovy(35);
+
 export function setFocal(api: Api, mm: number): void {
+    fovyDeg = focalToFovy(mm);
     void HrzApi.CameraSettingsPathBuilder.create(CAMERA).fovy().set(api, focalToFovy(mm));
 }
 
 export async function initCamera(api: Api, focalMm: number): Promise<void> {
+    fovyDeg = focalToFovy(focalMm);
     await HrzApi.CameraSettingsPathBuilder.create(CAMERA).set(api, {
         fovy: focalToFovy(focalMm),
         userControlsInertia: 0.12,
@@ -144,11 +149,58 @@ function angular(v: Viewpoint): HrzProtocol.AngularViewpoint.$Properties {
     };
 }
 
-/** Fly to a viewpoint, staying inside the island window. */
-export function flyTo(api: Api, v: Viewpoint, seconds = 3.2): void {
+// --- Framing around the UI --------------------------------------------------
+
+/** Bands of the view hidden by the UI, in CSS px from the top and bottom of the screen. */
+export type Occlusion = { top: number; bottom: number };
+let occlusion = (): Occlusion => ({ top: 0, bottom: 0 });
+
+/** Tell the camera which parts of the screen the UI hides (phone: search bar, bottom sheet). */
+export function setOcclusion(provider: () => Occlusion): void {
+    occlusion = provider;
+}
+
+/**
+ * Same camera position, but the view tilted down so that the target lands in the
+ * middle of the visible band instead of the middle of the screen. Flat-ground
+ * approximation, fine at the scale of the island.
+ */
+function framed(v: Viewpoint): Viewpoint {
+    const { top, bottom } = occlusion();
+    if (top === bottom) return v;
+    const shift = Math.atan(((bottom - top) / innerHeight) * Math.tan(rad(fovyDeg) / 2));
+    const tilt = rad(v.tilt);
+    const tilted = Math.min(rad(84), Math.max(0, tilt - shift));
+    const height = v.distance * Math.cos(tilt);
+    // How far the looked-at point moves toward the camera.
+    const toward = v.distance * Math.sin(tilt) - height * Math.tan(tilted);
+    const bearing = rad(v.bearing);
+    return {
+        ...v,
+        lat: v.lat - (toward * Math.cos(bearing)) / M_PER_DEG,
+        lon: v.lon - (toward * Math.sin(bearing)) / (M_PER_DEG * Math.cos(rad(v.lat))),
+        distance: height / Math.cos(tilted),
+        tilt: (tilted * 180) / Math.PI,
+    };
+}
+
+const M_PER_DEG = 111_320;
+
+/** Share of the screen height left visible by the UI. */
+function visibleShare(): number {
+    const { top, bottom } = occlusion();
+    return Math.max(0.3, 1 - (top + bottom) / innerHeight);
+}
+
+/**
+ * Fly to a viewpoint, staying inside the island window. By default the target is
+ * framed in the part of the screen the UI leaves visible; `exact` aims at the
+ * screen centre (drone flight, which then drives the camera itself).
+ */
+export function flyTo(api: Api, v: Viewpoint, seconds = 3.2, exact = false): void {
     void api.CameraService.setOrbit({
         ...orbitLimits,
-        angularViewpoint: angular(v),
+        angularViewpoint: angular(exact ? v : framed(v)),
         goToAnimation: {
             duration: seconds,
             easingFunction: HrzProtocol.EasingFunctions.EASE_INOUT,
@@ -161,7 +213,8 @@ export function flyTo(api: Api, v: Viewpoint, seconds = 3.2): void {
 /** Frame a lon/lat bounding box with an oblique view. */
 export function flyToBox(api: Api, [w, s, e, n]: [number, number, number, number], alt: number, bearing = -20): void {
     const span = Math.max((e - w) * 104_000, (n - s) * 111_000);
-    flyTo(api, { lat: (s + n) / 2, lon: (w + e) / 2, alt, distance: Math.max(2200, span * 1.7), bearing, tilt: 55 });
+    // Farther back when the UI hides part of the screen, so the whole box still fits.
+    flyTo(api, { lat: (s + n) / 2, lon: (w + e) / 2, alt, distance: Math.max(2200, (span * 1.7) / visibleShare()), bearing, tilt: 55 });
 }
 
 /** Fly to a place keeping the current compass heading (no disorienting spin). */

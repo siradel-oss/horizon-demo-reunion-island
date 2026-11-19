@@ -12,6 +12,13 @@ import { MAIN_VIEW } from "./layers";
 const ATTR_FID = 1;
 const NUMBER = HrzProtocol.AttributeTransform.ATTRIBUTE_TRANSFORM_TO_NUMBER;
 const PX = HrzProtocol.InWorldSizeUnit.IN_WORLD_SIZE_IN_PIXELS;
+
+/**
+ * CSS pixels → the engine's pixel unit for draped overlays. Horizon 26.1 draws
+ * them devicePixelRatio times too wide (a 2.6 px trail is ~7 CSS px on a
+ * phone), so sizes are divided by the ratio.
+ */
+export const px = (cssPx: number) => cssPx / (window.devicePixelRatio || 1);
 const WGS84 = { descriptorType: HrzProtocol.SrsDescriptorType.SRID_DESCRIPTOR, descriptor: "EPSG:4326" };
 const ISLAND = { west: 55.1, south: -21.5, east: 55.95, north: -20.8 };
 const ATTR_NAMES = ["fid", "kind"];
@@ -49,7 +56,7 @@ export const point = (lon: number, lat: number): Geometry => ({
 });
 
 export function line(id: number, width: number, zIndex: number, c: ColorProp, extra: Partial<HrzProtocol.FlatOverlayPolylineVectorRepr.$Properties> = {}): Repr {
-    return { id, sceneViews: MAIN_VIEW, flatOverlayPolyline: { color: c, width: { defaultValue: width }, widthUnit: PX, roundTips: true, zIndex, ...extra } };
+    return { id, sceneViews: MAIN_VIEW, flatOverlayPolyline: { color: c, width: { defaultValue: px(width) }, widthUnit: PX, roundTips: true, zIndex, ...extra } };
 }
 
 export function dot(id: number, radius: number, zIndex: number, fill: ColorProp, outline: string, outlineWidth: number, outlineAlpha = 1): Repr {
@@ -58,10 +65,10 @@ export function dot(id: number, radius: number, zIndex: number, fill: ColorProp,
         sceneViews: MAIN_VIEW,
         flatOverlayPoint: {
             color: fill,
-            radius: { defaultValue: radius },
+            radius: { defaultValue: px(radius) },
             radiusUnit: PX,
             outlineColor: { defaultValue: color(outline, outlineAlpha) },
-            outlineWidth: { defaultValue: outlineWidth },
+            outlineWidth: { defaultValue: px(outlineWidth) },
             outlineWidthUnit: PX,
             zIndex,
         },
@@ -118,6 +125,9 @@ export async function createOverlay(api: Api, name: string, from: OverlaySource,
         sceneViews: MAIN_VIEW,
         clipId: -1,
         staticTiles: false,
+        // tippecanoe skips empty tiles: a tile missing from the PMTiles is an empty one,
+        // not a reason to draw its lower-resolution parent in its place.
+        missingTilePolicy: HrzProtocol.MissingTilePolicy.USE_EMPTY_TILE,
         source: { vectorDataLayerId: dataId, overrideBounds: true, bounds: ISLAND },
         clamping: { method: HrzProtocol.VectorClampMode.PER_VERTEX },
         resolution: { maxScreenSpaceError: 2 },

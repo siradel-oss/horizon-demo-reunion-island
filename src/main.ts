@@ -24,6 +24,7 @@ import {
     flyTo,
     flyToBox,
     flyToPlace,
+    setOcclusion,
     initCamera,
     initHover,
     initTerrainLook,
@@ -39,6 +40,7 @@ import {
 import { startTour, type Tour } from "./engine/tour";
 import { addTrailLayers, type TrailLayers } from "./engine/trail-layers";
 import { addTrees, type Trees } from "./engine/trees";
+import { PHONE } from "./engine/device";
 import { createAmbiancePanel, formatHour } from "./ui/ambiance-panel";
 import { createNavControls } from "./ui/nav-controls";
 import { createAbout } from "./ui/about";
@@ -48,7 +50,7 @@ import { createHikePanel } from "./ui/hike-panel";
 import { createPoiPanel } from "./ui/poi-panel";
 import { mountProfile, type Profile } from "./ui/profile";
 import { createSearchBox } from "./ui/search-box";
-import { createSheet } from "./ui/sheet";
+import { createSheet, PHONE_LAYOUT } from "./ui/sheet";
 import { createSunStrip, type SunStrip } from "./ui/sun-strip";
 import { createTourControls } from "./ui/tour-controls";
 import { SIRADEL_LOGO } from "./ui/siradel-logo";
@@ -77,14 +79,9 @@ const ambianceToggle = $<HTMLButtonElement>(".ambiance-toggle");
 const hoverTip = $("#hover-tip");
 const introStatus = $(".intro-status");
 
-/** Keep the drawing buffer at device resolution. */
-function fitCanvas() {
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.round(canvas.clientWidth * dpr);
-    canvas.height = Math.round(canvas.clientHeight * dpr);
-}
-new ResizeObserver(fitCanvas).observe(canvas);
-fitCanvas();
+// The canvas size is left to the engine: it watches the canvas and applies the
+// device pixel ratio itself (sizing it here too made it apply the ratio twice:
+// touches only reached the top of the view, draped lines got too wide).
 
 // Static texts of index.html, in the current language.
 const STATIC: [selector: string, text: Parameters<typeof t>[0], attr?: string][] = [
@@ -129,7 +126,9 @@ async function main() {
     // Dev only: drive the engine from the browser console.
     if (import.meta.env.DEV) Object.assign(window, { hrz: { api, HrzApi, HrzProtocol } });
 
-    const [trees] = await Promise.all([addTrees(api), addTerrain(api), addOrthophoto(api), addBuildings(api)]);
+    // No 3D trees on phones: too heavy for their memory and GPU.
+    const noTrees: Trees = { setVisible() {} };
+    const [trees] = await Promise.all([PHONE ? noTrees : addTrees(api), addTerrain(api), addOrthophoto(api), addBuildings(api)]);
     const trailLayers = await addTrailLayers(api, trailsData.trails, trailsData.attribution);
     const poiLayers = await addPoiLayers(api, poisData.attribution);
     const marker = await addPlaceMarker(api);
@@ -171,6 +170,14 @@ function startUi(
     let tour: Tour | null = null;
     let profile: Profile | null = null;
     const sheet = createSheet(panel, $(".sheet-handle"));
+    // Phone: frame flights in the band between the search bar and the bottom sheet
+    // (plus the trail profile floating over a folded sheet).
+    setOcclusion(() => {
+        if (!PHONE_LAYOUT.matches) return { top: 0, bottom: 0 };
+        const bar = innerHeight - $(".tabs").getBoundingClientRect().top;
+        const profile = dock.hidden || sheet.state !== "mini" ? 0 : dock.getBoundingClientRect().height + 10;
+        return { top: $(".topbar").getBoundingClientRect().bottom, bottom: bar + sheet.height + profile };
+    });
     let sunStrip: SunStrip | null = null;
     let hour = START_AMBIANCE.hour;
     let treesOn = false;
@@ -264,7 +271,6 @@ function startUi(
         trailLayers.select(i);
         trailLayers.setHiker(null);
         const trail = trails[i];
-        flyToBox(api, trail.bbox, (trail.altMin + trail.altMax) / 2);
         // Phone: fold the sheet to its header; the profile shows above it.
         sheet.set("mini");
 
@@ -293,6 +299,8 @@ function startUi(
             seekFromProfile,
         );
         refreshSun();
+        // Once the sheet and profile are in place: the flight frames the trail above them.
+        flyToBox(api, trail.bbox, (trail.altMin + trail.altMax) / 2);
     }
 
     function clearTrail() {
@@ -421,7 +429,13 @@ function startUi(
         dock.hidden = tab !== "hike" || selectedTrail < 0;
         hoverTip.hidden = true;
     }
-    document.querySelectorAll<HTMLButtonElement>(".tab").forEach((b) => b.addEventListener("click", () => setTab(b.dataset.tab as Tab)));
+    document.querySelectorAll<HTMLButtonElement>(".tab").forEach((b) =>
+        b.addEventListener("click", () => {
+            // Phone: the current tab closes the sheet (map only) and opens it again.
+            if (b.dataset.tab === tab && PHONE_LAYOUT.matches) sheet.set(sheet.state === "closed" ? "half" : "closed");
+            else setTab(b.dataset.tab as Tab);
+        }),
+    );
 
     // --- Place search (IGN) and own position ------------------------------------
 

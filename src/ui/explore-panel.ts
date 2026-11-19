@@ -61,9 +61,12 @@ export function createExplorePanel(ev: ExploreEvents): ExplorePanel {
             "p",
             { class: "lede" },
             t({
-                en: "IGN aerial imagery, 1 m relief and buildings, from the lagoon to the summit. Drag to turn, scroll to dive in.",
-                fr: "Orthophotos, relief au mètre et bâtiments de l'IGN, du lagon au sommet. Faites glisser pour tourner, molette pour plonger.",
-            }),
+                en: "IGN aerial imagery, 1 m relief and buildings, from the lagoon to the summit. ",
+                fr: "Orthophotos, relief au mètre et bâtiments de l'IGN, du lagon au sommet. ",
+            }) +
+                (matchMedia("(pointer: coarse)").matches
+                    ? t({ en: "Drag to move, pinch to dive in.", fr: "Faites glisser pour vous déplacer, pincez pour plonger." })
+                    : t({ en: "Drag to turn, scroll to dive in.", fr: "Faites glisser pour tourner, molette pour plonger." })),
         ),
         h(
             "div",

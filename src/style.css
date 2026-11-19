@@ -76,6 +76,8 @@ body {
     margin: 0;
     height: 100%;
     overflow: hidden;
+    /* No pull-to-refresh or bounce: a vertical drag on the map moves the camera. */
+    overscroll-behavior: none;
     background: var(--ocean-night);
     color: var(--mist);
     font: 15px/1.5 var(--ui);
@@ -105,6 +107,9 @@ select {
     height: 100%;
     display: block;
     outline: none;
+    /* Every gesture on the view goes to the engine, none to the browser
+       (otherwise mobile browsers pan or zoom the page and cancel the gesture). */
+    touch-action: none;
 }
 
 /* --- Opening ------------------------------------------------------------- */
@@ -1665,8 +1670,18 @@ body.touring .panel:hover {
     :root {
         --gap: 10px;
         --tabbar: 58px;
+        --credits-h: 20px;
+        /* Everything under the sheet: tab bar, credits strip, home indicator. */
+        --bottombar: calc(var(--tabbar) + var(--credits-h) + env(safe-area-inset-bottom));
         --sheet-mini: 76px;
         --nav-size: 64px;
+    }
+
+    /* Opening: the subtitle spans the width, so the logo goes under it (still on the right). */
+    .intro-logo {
+        position: static;
+        justify-self: end;
+        margin-top: 28px;
     }
 
     /* The bar dissolves: its parts are laid out on their own (no backdrop
@@ -1722,9 +1737,9 @@ body.touring .panel:hover {
         position: fixed;
         left: 0;
         right: 0;
-        bottom: 0;
-        height: calc(var(--tabbar) + env(safe-area-inset-bottom));
-        padding: 6px 8px env(safe-area-inset-bottom);
+        bottom: calc(var(--credits-h) + env(safe-area-inset-bottom));
+        height: var(--tabbar);
+        padding: 6px 8px;
         margin: 0;
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -1746,7 +1761,7 @@ body.touring .panel:hover {
         top: auto;
         left: 0;
         right: 0;
-        bottom: calc(var(--tabbar) + env(safe-area-inset-bottom));
+        bottom: var(--bottombar);
         width: auto;
         border-radius: 20px 20px 0 0;
         border-bottom: 0;
@@ -1791,7 +1806,7 @@ body.touring .panel:hover {
     .dock {
         left: var(--gap);
         right: var(--gap);
-        bottom: calc(var(--tabbar) + env(safe-area-inset-bottom) + var(--sheet-mini) + var(--gap));
+        bottom: calc(var(--bottombar) + var(--sheet-mini) + var(--gap));
         height: 210px;
         padding: 10px 12px 8px;
     }
@@ -1815,10 +1830,17 @@ body.touring .panel:hover {
         margin-left: 34px;
     }
 
-    /* Compass only: fingers already pan, pinch and twist the map. */
+    /* Compass only (fingers already pan, pinch and twist the map), bottom right
+       just above a closed sheet: an open sheet slides over it. */
     #nav {
-        top: calc(var(--gap) + 44px + 10px);
-        bottom: auto;
+        bottom: calc(var(--bottombar) + 24px + var(--gap));
+        z-index: 4;
+    }
+
+    /* Shown only over a closed sheet (its tip would peek past a folded one). */
+    body:not([data-sheet="closed"]) #nav {
+        opacity: 0;
+        pointer-events: none;
     }
 
     .nav-zooms,
@@ -1833,16 +1855,36 @@ body.touring .panel:hover {
         left: var(--gap);
         right: var(--gap);
         width: auto;
-        max-height: calc(100dvh - 44px - var(--tabbar) - 4 * var(--gap));
+        max-height: calc(100dvh - 44px - var(--bottombar) - 4 * var(--gap));
         z-index: 14;
     }
 
+    /* A thin strip under the tab bar; the full list is one tap away (About → sources). */
     .credits {
-        top: calc(var(--gap) + 44px + 6px);
-        bottom: auto;
-        left: var(--gap);
-        right: calc(var(--nav-size) + 2 * var(--gap));
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: calc(var(--credits-h) + env(safe-area-inset-bottom));
+        padding: 0 12px env(safe-area-inset-bottom);
+        justify-content: center;
+        gap: 8px;
+        background: var(--surface-solid);
         font-size: 9.5px;
+        text-shadow: none;
+        z-index: 12;
+        animation: none;
+    }
+
+    .credits-logo {
+        flex: none;
+        height: 9px;
+    }
+
+    .credits-sources {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 }
 

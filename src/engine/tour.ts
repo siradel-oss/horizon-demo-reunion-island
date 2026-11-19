@@ -77,6 +77,7 @@ export function startTour(api: Api, trail: Trail, cb: TourCallbacks, options: To
             tilt: (Math.atan2(BACK_M, UP_M) * 180) / Math.PI,
         },
         APPROACH_S,
+        true,
     );
 
     const frame = (now: number) => {
