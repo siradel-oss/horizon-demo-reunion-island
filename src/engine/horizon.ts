@@ -55,34 +55,7 @@ export async function boot(canvas: HTMLCanvasElement): Promise<Api> {
         );
     });
     await pumpUntilReady(api);
-    fixPointerScale(canvas);
     return api;
-}
-
-/**
- * Horizon 26.1 applies the device pixel ratio twice to pointer positions: on a
- * phone (ratio ~2.6) a gesture below the top third of the view falls "outside"
- * it and is ignored (same with a mouse on a HiDPI screen). The engine reads
- * `offsetX/Y` in its `canvas.onpointer*` handlers: hand it CSS pixels divided
- * by the ratio. To remove once the engine is fixed.
- */
-function fixPointerScale(canvas: HTMLCanvasElement): void {
-    for (const key of ["onpointerdown", "onpointermove", "onpointerup", "onpointercancel"] as const) {
-        const handler = canvas[key];
-        if (!handler) continue;
-        canvas[key] = (event: PointerEvent) =>
-            handler.call(
-                canvas,
-                new Proxy(event, {
-                    get(target, prop) {
-                        if (prop === "offsetX") return target.offsetX / devicePixelRatio;
-                        if (prop === "offsetY") return target.offsetY / devicePixelRatio;
-                        const value = Reflect.get(target, prop, target);
-                        return typeof value === "function" ? value.bind(target) : value;
-                    },
-                }),
-            );
-    }
 }
 
 /** Start the (endless) message pump and resolve on ViewerReadyMessage. */

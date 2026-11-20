@@ -19,13 +19,10 @@ export async function pickAt(api: Api, canvas: HTMLCanvasElement, clientX: numbe
             resolve((m.pick.results?.results ?? []).filter((r) => r.vector).map((r) => ({ layer: r.layer?.handle, featureId: r.vector?.featureId })));
         });
     }
-    // Horizon 26.1 applies the device pixel ratio twice to pick positions, as it
-    // does to pointer positions (see fixPointerScale): hand it CSS pixels divided
-    // by the ratio, or a tap on a phone picks far below and right of the finger.
+    // pickScreen takes logical (CSS) pixels.
     const rect = canvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    const x = Math.round((clientX - rect.left) / dpr);
-    const y = Math.round((clientY - rect.top) / dpr);
+    const x = Math.round(clientX - rect.left);
+    const y = Math.round(clientY - rect.top);
     const { hasATicket, ticket } = await api.ViewerService.pickScreen({ coords: { x, y }, includedRasters: [] });
     if (!hasATicket || !ticket) return [];
     return new Promise((resolve) => {
